@@ -1,22 +1,27 @@
 #include <string>
 #include <vector>
-
+#include <stack>
 using namespace std;
 
-vector<int> solution(vector<int> prices)
+vector<int> solution(vector<int> prices) 
 {
     vector<int> answer(prices.size());
-
-    for (int i = 0; i < prices.size(); ++i)
+    stack<int> st;
+    
+    for(int i = 0; i < prices.size(); ++i)
     {
-        int temp = 0;
-        for (int j = i + 1; j < prices.size(); ++j)
-        {   
-            temp++;
-            if (prices[i] > prices[j])            
-                break;                       
+        while(!st.empty() && prices[st.top()] > prices[i]) //가장 최근에 넣은 값보다 작은 값이 등장할때
+        {
+            answer[st.top()] = i - st.top();
+            st.pop();
         }
-        answer[i] = temp;
+        st.push(i);
     }
+    while(!st.empty())
+    {
+        answer[st.top()] = prices.size() - 1 - st.top();
+        st.pop();
+    }
+    
     return answer;
 }
