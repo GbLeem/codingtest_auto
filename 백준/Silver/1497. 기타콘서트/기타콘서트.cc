@@ -1,66 +1,19 @@
 #include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <climits>
 using namespace std;
 
 int n, m;
-vector<pair<string, string>> vec;
-char check[52]; //NNNNN
-vector<pair<int, int>> result;
+long long state[10];
 
-void bitmasking()
+//x가 가지는 1의 갯수를 반환하는 함수
+int bitcount(long long x)
 {
-	int answer = INT_MAX;
-	int cnt = 0;
-
-	for (int i = 0; i < (1 << vec.size()); ++i)
+	int ret = 0;
+	for (int i = 0; i < m; ++i)
 	{
-		fill(check, check + m, 'N');
-		cnt = 0;
-
-		for (int j = 0; j < vec.size(); ++j)
-		{
-			//모든 경우의 수
-			if (i & (1 << j))
-			{				
-				for (int k = 0; k < vec[j].second.size(); ++k)
-				{
-					//check 배열 바꿔주고
-					if(check[k] == 'N')
-						check[k] = vec[j].second[k];					
-				}				
-				//기타 갯수 추가
-				cnt++;
-			}
-		}
-
-		//Y의 갯수
-		int cntY = 0;
-		for (int k = 0; k < m; ++k)
-		{
-			if (check[k] == 'Y')
-			{
-				cntY++;
-			}
-		}
-		result.push_back({ cntY, cnt });
+		ret += (x >> i) & 1;
+		//ret += 1 & (i << x);
 	}
-
-	sort(result.begin(), result.end());
-	int maxY = result.back().first;
-
-	for (auto r : result)
-	{
-		if (r.first == maxY)
-			answer = min(answer, r.second);
-	}
-	
-	if (answer == 0)
-		cout << -1;
-	else
-		cout << answer;
+	return ret;
 }
 
 int main()
@@ -72,11 +25,35 @@ int main()
 
 	for (int i = 0; i < n; ++i)
 	{
-		string name, song;
-		cin >> name >> song;
+		string name, temp;
+		cin >> name >> temp;
 
-		vec.push_back({ name, song });
+		for (int j = m - 1; j >= 0; --j)
+		{
+			state[i] = (state[i] << 1) | (temp[j] == 'Y');
+		}
 	}
-	
-	bitmasking();
+
+	pair<int, int> ans = { 0, -1 };//곡의 수, 기타 수
+	for (int tmp = 0; tmp < (1 << n); ++tmp)
+	{
+		long long comb = 0; //조합 결과
+		for (int i = 0; i < m; ++i)
+		{
+			if (!(tmp & (1LL << i)))
+				continue;
+			comb |= state[i];
+		}
+
+		int song = bitcount(comb);
+		int guitar = bitcount(tmp);
+
+		//곡의 수가 더 많은 경우
+		if (ans.first < song)
+			ans = { song, guitar };
+		//곡의 수는 같은데 기타가 적은 경우
+		else if (ans.first == song && ans.second > guitar)
+			ans = { song, guitar };
+	}
+	cout << ans.second;
 }
