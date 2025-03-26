@@ -1,37 +1,47 @@
+#include <iostream>
 #include <vector>
-#include <queue>
-#include <unordered_map>
 #include <algorithm>
 using namespace std;
 
-unordered_map<string, vector<string>> um;
+vector<vector<string>> ticket;
 vector<string> answer;
+bool vis[10002];
+bool isAnswer;
 
-void DFS(string cur)
+void DFS(string cur, int cnt)
 {
-    while (!um[cur].empty())
-    {
-        string nxt = um[cur].front();
-        um[cur].erase(um[cur].begin());
-        DFS(nxt);
-    }
-    answer.push_back(cur);
+	answer.push_back(cur);
+
+	//모든 티켓을 다 쓴 상황
+	if (cnt == ticket.size())
+	{
+		isAnswer = true;
+	}
+
+	for (int i = 0; i < ticket.size(); ++i)
+	{
+		if (vis[i])
+			continue;
+		if (ticket[i][0] == cur)
+		{
+			vis[i] = true;
+			DFS(ticket[i][1], cnt + 1);
+
+			if (!isAnswer)
+			{
+				answer.pop_back();
+				vis[i] = false;
+			}
+		}
+	}
+
 }
 
-vector<string> solution(vector<vector<string>> tickets)
+vector<string>solution(vector<vector<string>>tickets)
 {
-    for (int i = 0; i < tickets.size(); ++i)
-    {
-        um[tickets[i][0]].push_back(tickets[i][1]);
-    }
-    
-    for(auto & [key, value] : um)
-    {
-        sort(value.begin(), value.end());
-    }
-    DFS("ICN");
+	sort(tickets.begin(), tickets.end());
+	ticket = tickets;
+	DFS("ICN", 0);
 
-    reverse(answer.begin(), answer.end());
-
-    return answer;
+	return answer;
 }
