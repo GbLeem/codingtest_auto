@@ -1,34 +1,34 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 int n, m;
-int arr[10];
-int isused[10];
+vector<int> ans;
 
-void func(int cur)
+void Choose(int cur, int start)
 {
 	if (cur == m)
 	{
-		for (int i = 0; i < m; ++i)
-			cout << arr[i] << " ";
+		for (const int& a : ans)
+		{
+			cout << a << " ";
+		}
 		cout << "\n";
+
 		return;
 	}
-	int index = 1;
-	if (cur != 0)
-		index = arr[cur - 1] + 1;
 
-	for (int i = index; i <= n; ++i)
+	for (int i = start; i <= n; ++i)
 	{
-		if (!isused[i])
-		{
-			arr[cur] = i;
-			isused[i] = 1;
-			func(cur + 1);
-			isused[i] = 0;
-		}
+		
+        ans.push_back(i);
+        Choose(cur + 1, i + 1);
+        ans.pop_back();
+		
 	}
 }
+
+
 int main()
 {
 	ios::sync_with_stdio(0);
@@ -36,5 +36,5 @@ int main()
 
 	cin >> n >> m;
 
-	func(0);
+	Choose(0, 1);
 }
