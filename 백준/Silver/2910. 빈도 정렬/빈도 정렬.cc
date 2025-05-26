@@ -1,66 +1,50 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <tuple>
+#include <unordered_map>
+#include <algorithm>
 using namespace std;
 
-int arr[1001];
 int n, c;
+unordered_map<int, int> cnt; //value count
+unordered_map<int, int> idx; //value idx
 
-bool cmp(const tuple<int, int, int>& a, const tuple<int, int, int>& b)
+bool cmp(pair<int, int> a, pair<int, int>b)
 {
-	if (get<0>(a) == get<0>(b))
-		return get<2>(a) < get<2>(b);
-	return get<0>(a) > get<0>(b);
+	//count가 같은 경우
+	if (a.second == b.second)
+		return idx[a.first] < idx[b.first];
+	return a.second > b.second;
 }
 
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
-
+	
 	cin >> n >> c;
-
-	vector<pair<int, int>> temp; //value index
-	vector<tuple<int, int, int>> vec; //cnt value, index
 
 	for (int i = 0; i < n; ++i)
 	{
 		int num;
 		cin >> num;
-		temp.push_back({ num, i });
-	}
-
-	stable_sort(temp.begin(), temp.end()); //1 1 1 2 2 2 3 3 3
-
-	int cnt = 1;
-	int index = -1;
-	for (int i = 0; i < n; ++i)
-	{
-		if (i == n - 1 || temp[i].first != temp[i + 1].first)
+		
+		cnt[num]++;
+		if (idx[num] == 0)
 		{
-			if (index == -1)
-				index = temp[i].second;
-			vec.push_back({ cnt, temp[i].first, index});
-			cnt = 1;
-			index = -1;
-		}
-		else if (temp[i].first == temp[i + 1].first)
-		{
-			cnt++;
-			if (index == -1)
-				index = temp[i].second;
+			//인덱스 0방지
+			idx[num] = i + 1;
 		}
 	}
-
+	//복제
+	//value, count
+	vector<pair<int, int>> vec(cnt.begin(), cnt.end());
 	sort(vec.begin(), vec.end(), cmp);
 
-	for (int i = 0; i < vec.size(); ++i)
+	for (const auto& v : vec)
 	{
-		while (get<0>(vec[i]) > 0)
+		for (int i = 0; i < v.second; ++i)
 		{
-			cout << get<1>(vec[i]) << " ";
-			get<0>(vec[i])--;
+			cout << v.first << " ";
 		}
 	}
 }
