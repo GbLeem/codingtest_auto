@@ -1,91 +1,93 @@
 #include <iostream>
-#include <vector>
 #include <queue>
-#include <string>
-
 using namespace std;
 
-int R, C; //세로(행) 가로(열)
-string board[1002];
-int dist[1002][1002];
-int dist_fire[1002][1002];
-int dx[4] = { 1,0,-1,0 };
-int dy[4] = { 0,1,0,-1 };
+int r, c;
+string arr[1002];
+int visJ[1002][1002];
+int visF[1002][1002];
 
+int dx[4] = { 1, 0, -1, 0 };
+int dy[4] = { 0, 1, 0, -1 };
 
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
-
-	cin >> R >> C;
-	for (int i = 0; i < R; ++i)
+	
+	cin >> r >> c;
+	
+	for (int i = 0; i < r; ++i)
 	{
-		cin >> board[i];
-		fill(dist[i], dist[i] + C, -1);
-		fill(dist_fire[i], dist_fire[i] + C, -1);
+		cin >> arr[i];
 	}
-	queue<pair<int, int>> Q;
-	queue<pair<int, int>> Q_fire;
+	queue<pair<int, int>> qf;
+	queue<pair<int, int>> qj;
 
-	for (int i = 0; i < R; ++i)
+	for (int i = 0; i < r; ++i)
 	{
-		for (int j = 0; j < C; ++j)
+		for (int j = 0; j < c; ++j)
 		{
-			if (board[i][j] == 'F')
+			//불 여러개?
+			if (arr[i][j] == 'F')
 			{
-				Q_fire.push({ i, j });
-				dist_fire[i][j] = 0;
+				qf.push({ i, j });
+				visF[i][j] = 1;
 			}
-			if (board[i][j] == 'J')
+			if (arr[i][j] == 'J')
 			{
-				Q.push({ i, j });
-				dist[i][j] = 0;
+				qj.push({ i, j });
+				visJ[i][j] = 1;
 			}
 		}
 	}
 
-	//불은 지훈이에 대해 영향 안받아서 먼저 돌려버려도 ok
-	while (!Q_fire.empty())
-	{
-		auto cur = Q_fire.front();
-		Q_fire.pop();
+	while (!qf.empty())
+	{		
+		auto cur = qf.front();
+		qf.pop();
+
 		for (int dir = 0; dir < 4; ++dir)
 		{
 			int nx = cur.first + dx[dir];
 			int ny = cur.second + dy[dir];
 
-			if (nx < 0 || nx >= R || ny < 0 || ny >= C)
+			if (nx < 0 || nx >= r || ny < 0 || ny >= c)
 				continue;
-			if (dist_fire[nx][ny] >= 0 || board[nx][ny] == '#')
+
+			//방문, 벽
+			if (visF[nx][ny] >= 1 || arr[nx][ny] == '#')
 				continue;
-			dist_fire[nx][ny] = dist_fire[cur.first][cur.second] + 1;
-			Q_fire.push({ nx, ny });
-		}
+
+			visF[nx][ny] = visF[cur.first][cur.second] + 1;
+			qf.push({ nx, ny });
+		}		
 	}
 
-	//지훈이는 불에 영향 받음
-	while (!Q.empty())
+	while (!qj.empty())
 	{
-		auto cur = Q.front();
-		Q.pop();
+		auto cur = qj.front();
+		qj.pop();
+
 		for (int dir = 0; dir < 4; ++dir)
 		{
 			int nx = cur.first + dx[dir];
 			int ny = cur.second + dy[dir];
 
-			if (nx < 0 || nx >= R || ny < 0 || ny >= C) //성공
+			if (nx < 0 || nx >= r || ny < 0 || ny >= c)
 			{
-				cout << dist[cur.first][cur.second] + 1;
+				cout << visJ[cur.first][cur.second];
 				return 0;
 			}
-			if (dist[nx][ny] >= 0 || board[nx][ny] == '#')
+			if (visJ[nx][ny] >= 1 || arr[nx][ny] == '#')
 				continue;
-			if (dist_fire[nx][ny] != -1 && dist_fire[nx][ny] <= dist[cur.first][cur.second] + 1)
+			//
+			if (visF[nx][ny] >= 1 && visF[nx][ny] <= visJ[cur.first][cur.second] + 1)
 				continue;
-			dist[nx][ny] = dist[cur.first][cur.second] + 1;
-			Q.push({ nx, ny });
+			visJ[nx][ny] = visJ[cur.first][cur.second] + 1;
+			qj.push({ nx, ny });
 		}
 	}
+
 	cout << "IMPOSSIBLE";
 }
