@@ -3,8 +3,8 @@
 using namespace std;
 
 int n, k;
-int board[100005];
-int cnt = 0;
+pair<int, int>board[100'002];
+int answer = 0;
 
 int main()
 {
@@ -14,12 +14,9 @@ int main()
 	cin >> n >> k;
 
 	queue<int> q;
-	fill(board, board + 100002, -1);
-	board[n] = 0;
 	q.push(n);
-
+	board[n] = { 1, 1 }; //값, 갯수
 	bool first = true;
-	int temp = -1;
 
 	if (n == k)
 	{
@@ -27,48 +24,27 @@ int main()
 		return 0;
 	}
 
-	while (!q.empty())
+	while(!q.empty())
 	{
 		int cur = q.front();
 		q.pop();
-		for (int nxt : {cur + 1, cur - 1, cur * 2})
+
+		for (int nxt : {cur - 1, cur + 1, cur * 2})
 		{
-			if (nxt < 0 || nxt > 100000)
+			if (nxt < 0 || nxt > 100'000)
 				continue;
-			
-			//이미 방문했을때
-			if (board[nxt] != -1)
-			{
-				//우리가 찾고자하는 값이면
-				if (nxt == k && board[cur] + 1 == temp)
-				{
-					cnt++;
-				}
-				//이전 방문 횟수랑 이번 방문 횟수랑 같으면 허용
-				else if(board[nxt] == board[cur] + 1)
-				{
-					q.push(nxt);
-					board[nxt] = board[cur] + 1;
-					continue;
-				}
-				//아니면
-				else
-					continue;
-			}
 
-			q.push(nxt);
-			board[nxt] = board[cur] + 1;
-
-			if (first && nxt == k)
+			if (board[nxt].first == 0)
 			{
-				temp = board[nxt];
-				//cout << "temp: " << temp << "\n";
-				first = false;
-				cnt++;
+				q.push(nxt);
+				board[nxt].first = board[cur].first + 1;
+				board[nxt].second += board[cur].second;
 			}
+			else if (board[nxt].first == board[cur].first + 1)
+			{
+				board[nxt].second += board[cur].second;
+			}			
 		}
 	}
-	cout << board[k] << "\n";
-	cout << cnt;
-
+	cout << board[k].first - 1 << "\n" << board[k].second;
 }
