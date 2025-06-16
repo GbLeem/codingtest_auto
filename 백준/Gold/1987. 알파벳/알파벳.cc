@@ -1,14 +1,19 @@
+//덮어써질 우려가 있음,,,
+//최단 경로가 아니라 뭔가 다 해보고 찾는 경우 dfs (백트래킹) 기법을 사용할껏
+//추가적으로 배열의 크기도 22x22로 매우 작으니까 의심할만하다.
+
 #include <iostream>
-#include <unordered_map>
+#include <string>
+#include <stack>
+#include <climits>
 using namespace std;
 
-int r, c;
-char board[22][22];
+int R, C;
+string arr[22];
 bool vis[28];
-
-int dx[4] = { 0,1,0,-1 };
-int dy[4] = { 1,0,-1,0 };
-int answer = 0;
+int dx[4] = { 1, 0, -1, 0 };
+int dy[4] = { 0, 1, 0, -1 };
+int answer = -1;
 
 void dfs(int x, int y, int cnt)
 {
@@ -19,36 +24,33 @@ void dfs(int x, int y, int cnt)
 		int nx = x + dx[dir];
 		int ny = y + dy[dir];
 
-		if (nx < 0 || nx >= r || ny < 0 || ny >= c)
+		if (nx < 0 || nx >= R || ny < 0 || ny >= C)
 			continue;
 
-		if (!vis[board[nx][ny] -'A'])
+		if (!vis[arr[nx][ny] - 'A'])
 		{
-			vis[board[nx][ny]-'A'] = 1;
+			vis[arr[nx][ny] - 'A'] = 1;
 			dfs(nx, ny, cnt + 1);
-			vis[board[nx][ny]-'A'] = 0;
+			vis[arr[nx][ny]- 'A'] = 0;
 		}
-
 	}
-}
 
+}
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 
-	cin >> r >> c;
+	cin >> R >> C;
 
-	for (int i = 0; i < r; ++i)
+	for (int i = 0; i < R; ++i)
 	{
-		for (int j = 0; j < c; ++j)
-		{
-			cin >> board[i][j];
-		}
+		cin >> arr[i];
 	}
 
-	vis[board[0][0] - 'A'] = 1;
+	vis[arr[0][0] - 'A'] = 1;
+
 	dfs(0, 0, 1);
 
-	cout << answer;
+	cout << answer;	
 }
