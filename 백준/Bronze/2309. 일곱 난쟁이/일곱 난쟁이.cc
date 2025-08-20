@@ -3,37 +3,8 @@
 #include <algorithm>
 using namespace std;
 
-int arr[9];
-vector<int> ans;
-vector<int> res;
+vector<int> vec;
 int sum = 0;
-
-void Choose(int cur)
-{
-	if (cur == 2)
-	{
-		int tempSum = sum;
-		tempSum -= arr[ans[0]];
-		tempSum -= arr[ans[1]];
-
-		if (tempSum == 100)
-		{
-			res.clear();
-			for (int i = 0; i < 9; ++i)
-			{
-				if (i != ans[0] && i != ans[1])
-					res.push_back(arr[i]);
-			}
-		}
-		return;
-	}
-	for (int i = 0; i < 9; ++i)
-	{
-		ans.push_back(i);
-		Choose(cur + 1);
-		ans.pop_back();
-	}
-}
 
 int main()
 {
@@ -42,15 +13,28 @@ int main()
 
 	for (int i = 0; i < 9; ++i)
 	{
-		cin >> arr[i];
-		sum += arr[i];
+		int num;
+		cin >> num;
+		vec.push_back(num);
+		sum += num;
 	}
 
-	Choose(0);
-
-	sort(res.begin(), res.end());
-	for (const auto& r : res)
+	sort(vec.begin(), vec.end());
+	
+	for (int i = 0; i < vec.size() - 1; ++i)
 	{
-		cout << r << "\n";
+		for (int j = i + 1; j < vec.size(); ++j)
+		{
+			int temp = vec[i] + vec[j];
+			if (sum - temp == 100)
+			{
+				for (const auto& vi : vec)
+				{
+					if (vi != vec[i] && vi != vec[j])
+						cout << vi << "\n";
+				}
+				return 0;
+			}
+		}
 	}
 }
